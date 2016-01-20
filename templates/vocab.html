@@ -90,26 +90,78 @@
 
 <br />
 
-{% if session.matches|length is not equalto 0  %}
+<p id="error_text">
+
+</p>
+
+<br />
+
 <h2>You found </h2>
 <p id="results">
-  {% for match in session.matches %}
-  {{ match }} 
-  {% endfor %}
+ 
 </p>
-{% endif %}
 
 
-{% with messages = get_flashed_messages() %}
-  {% if messages %}
-    <!-- Mismatch, already found, etc. "flashed" from Python -->
-    {% for message in messages %}
-      <p class="message">{{ message }}</p>
-    {% endfor %}
-  {% endif %}
-{% endwith %}
 
+
+<script>
+var correct_count = 0;
+var target_count = {{ session.target_count }};
+var jumble = "{{ session.jumble }}";
+var correct_list = [ ] ;
+
+// Some browsers will interpret 'enter' key as form
+// submission.  Suppress that.
+//
+$("#entry").submit( function(event) {
+   // console.log("Suppressing form submission");
+   event.preventDefault();
+  });
+
+// On each keystroke, ask the server whether the current 
+// field content is a vocabulary word that can be formed
+// from the jumble.  (We use 'keyup' because the form value
+// is updated before that event is generated.  keypress doesn't work.)
+//
+$("#attempt").keyup(function() {
+   var txt = $("#attempt").val();
+   // We can only find a given word once
+   if (correct_list.indexOf(txt) >= 0) {
+       return;
+   }
+   // At least we haven't seen this ... is it in the wordlist
+   // and buildable with the jumble letters? 
+   $.getJSON( "/_check", { text: txt, jumble: jumble }, 
+              function(data) {
+                rsval = data.result.contains_word;
+                letterval = data.result.contains_text;
+                console.log("rsval: " + rsval)
+                console.log("letterval: " +letterval)
+                //word is in word list
+                if (rsval) {
+                   $("#results").append(txt + " ");
+                   correct_list.push(txt);
+                   correct_count += 1;
+                   $("#attempt").val("");
+				   if (correct_count >= target_count) {
+                      window.location.replace("success");
+                   }
+               }
+               if(!letterval){
+               		$("#error_text").html("Warning: Letter not in jumble");
+               		
+               	}
+               	else{
+               	$("#error_text").html("");}
+				
+             }
+           );
+   });
+
+</script>
 
 
  </div> <!-- container -->
 </body> </html>
+
+
