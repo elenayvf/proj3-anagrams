@@ -80,11 +80,11 @@
 <br />
 <div class="row">
   <div class="col-xs-6 text-center">
-  <form id="entry" method="POST" action="/_check">
+  <form id="entry" >
     <label for="attempt">Word:</label>
     <input id="attempt" name="attempt" type="text" width="15"
       autocomplete="off"  autofocus />
-    <input type="submit" name="try" />
+ 
   </form>
 </div></div>
 
@@ -137,7 +137,7 @@ $("#attempt").keyup(function() {
                 letterval = data.result.contains_text;
                 console.log("rsval: " + rsval)
                 console.log("letterval: " +letterval)
-                //word is in word list
+                //word is in word list6
                 if (rsval) {
                    $("#results").append(txt + " ");
                    correct_list.push(txt);
@@ -148,7 +148,7 @@ $("#attempt").keyup(function() {
                    }
                }
                if(!letterval){
-               		$("#error_text").html("Warning: Letter not in jumble");
+               		$("#error_text").html(txt[txt.length -1]+ " not in the jumble");
                		
                	}
                	else{
